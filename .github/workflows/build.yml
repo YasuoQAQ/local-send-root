@@ -1,0 +1,55 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Clone Flutter SDK
+        run: git clone --depth 1 --branch stable https://github.com/flutter/flutter.git ./flutter-sdk
+
+      - name: Add Flutter to PATH
+        run: echo "${{ github.workspace }}/flutter-sdk/bin" >> $GITHUB_PATH
+
+      - name: Pre-cache Flutter
+        run: flutter precache --android
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android licenses
+        run: flutter doctor --android-licenses 2>&1 | head -n 50 || true
+
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: ./app
+
+      - name: Build release APK
+        run: flutter build apk --release
+        working-directory: ./app
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LocalSend-Root-APK
+          path: app/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+
+      - name: Upload debug APK
+        run: flutter build apk --debug
+        working-directory: ./app
+
+      - name: Upload debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LocalSend-Root-debug-APK
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
