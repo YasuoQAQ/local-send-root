@@ -46,7 +46,7 @@ jobs:
         working-directory: app
 
       - name: Upload release APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: LocalSend-Root-release-APK
           path: app/build/app/outputs/flutter-apk/app-release.apk
