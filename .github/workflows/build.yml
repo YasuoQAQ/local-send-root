@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,14 +39,14 @@ jobs:
         run: flutter build apk --release
         working-directory: ./app
 
-      - name: Upload APK artifact
+      - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LocalSend-Root-APK
+          name: LocalSend-Root-release-APK
           path: app/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 7
 
-      - name: Upload debug APK
+      - name: Build debug APK
         run: flutter build apk --debug
         working-directory: ./app
 
