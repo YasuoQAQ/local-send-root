@@ -18,6 +18,9 @@ jobs:
         with:
           submodules: true
 
+      - name: List files (Debug)
+        run: ls -R
+
       - name: Clone Flutter SDK
         run: git clone --depth 1 --branch stable https://github.com/flutter/flutter.git ${{ github.workspace }}/flutter-sdk
 
@@ -32,15 +35,15 @@ jobs:
 
       - name: Get dependencies (Common)
         run: flutter pub get
-        working-directory: ./common
+        working-directory: common
 
       - name: Get dependencies (App)
         run: flutter pub get
-        working-directory: ./app
+        working-directory: app
 
       - name: Build release APK
         run: flutter build apk --release
-        working-directory: ./app
+        working-directory: app
 
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
