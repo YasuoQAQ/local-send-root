@@ -22,8 +22,8 @@ jobs:
       - name: Add Flutter to PATH
         run: echo "${{ github.workspace }}/flutter-sdk/bin" >> $GITHUB_PATH
 
-      - name: Pre-cache Flutter
-        run: flutter precache --android
+      - name: Verify Flutter version
+        run: flutter --version
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -32,12 +32,14 @@ jobs:
         run: flutter doctor --android-licenses 2>&1 | head -n 50 || true
 
       - name: Get dependencies
-        run: flutter pub get
-        working-directory: ./app
+        run: |
+          cd app
+          flutter pub get
 
       - name: Build release APK
-        run: flutter build apk --release
-        working-directory: ./app
+        run: |
+          cd app
+          flutter build apk --release
 
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
@@ -47,8 +49,9 @@ jobs:
           retention-days: 7
 
       - name: Build debug APK
-        run: flutter build apk --debug
-        working-directory: ./app
+        run: |
+          cd app
+          flutter build apk --debug
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
