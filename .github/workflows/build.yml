@@ -11,9 +11,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
 
     steps:
       - name: Checkout code
@@ -22,7 +19,7 @@ jobs:
           submodules: true
 
       - name: Clone Flutter SDK
-        run: git clone --depth 1 --branch stable https://github.com/flutter/flutter.git ../flutter-sdk
+        run: git clone --depth 1 --branch stable https://github.com/flutter/flutter.git flutter-sdk
 
       - name: Add Flutter to PATH
         run: echo "${{ github.workspace }}/flutter-sdk/bin" >> $GITHUB_PATH
@@ -37,10 +34,19 @@ jobs:
         run: flutter doctor --android-licenses 2>&1 | head -n 50 || true
 
       - name: Get dependencies
-        run: flutter pub get
+        run: |
+          set -e
+          echo "Current dir: $(pwd)"
+          echo "App dir contents:"
+          ls app/
+          echo "Pubspec exists:"
+          ls app/pubspec.yaml 2>/dev/null || echo "NOT FOUND"
+          flutter pub get
+        working-directory: app
 
       - name: Build release APK
         run: flutter build apk --release
+        working-directory: app
 
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
@@ -51,6 +57,7 @@ jobs:
 
       - name: Build debug APK
         run: flutter build apk --debug
+        working-directory: app
 
       - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
